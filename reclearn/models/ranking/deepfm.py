@@ -28,6 +28,7 @@ class DeepFM(Model):
 		"""
 		super(DeepFM, self).__init__()
 		self.feature_columns = feature_columns
+		#构建feature_columns对应的embedding层
 		self.embed_layers = {
 			feat['feat_name']: Embedding(input_dim=feat['feat_num'],
 										 input_length=1,
@@ -36,6 +37,7 @@ class DeepFM(Model):
 										 embeddings_regularizer=l2(embed_reg))
 			for feat in self.feature_columns
 		}
+		#构建特征字典 特征名对应索引
 		self.map_dict = {}
 		self.feature_length = 0
 		self.field_num = len(self.feature_columns)

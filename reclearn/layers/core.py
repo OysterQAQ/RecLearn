@@ -394,12 +394,17 @@ class New_FM(Layer):
           embed_inputs is 3D tensor with shape `(batch_size, fields, embed_dim)`
         """
         sparse_inputs, embed_inputs = inputs['sparse_inputs'], inputs['embed_inputs']
+        #拼接稀疏特征
         sparse_inputs = tf.concat([value for _, value in sparse_inputs.items()], axis=-1)
         # first order
+        #一阶特征
+        #查找非0元素的w求和 没有bias的线性变换
         first_order = tf.reduce_sum(tf.nn.embedding_lookup(self.w, sparse_inputs), axis=1)  # (batch_size, 1)
         # second order
+        #二阶特征（一阶embed后的特征，统一8维）
         square_sum = tf.square(tf.reduce_sum(embed_inputs, axis=1, keepdims=True))  # (batch_size, 1, embed_dim)
         sum_square = tf.reduce_sum(tf.square(embed_inputs), axis=1, keepdims=True)  # (batch_size, 1, embed_dim)
+        #二阶公式改写
         second_order = 0.5 * tf.reduce_sum(square_sum - sum_square, axis=2)  # (batch_size, 1)
         return first_order + second_order
 
